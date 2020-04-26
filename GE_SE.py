@@ -1243,6 +1243,7 @@ def GP_SE_3(dealer):
     collectors = []
     for i in range(3):                   
         df = KPI[KPI['dealer'] == dealer][i*12:(i+1)*12]
+        period = 'period_{}'.format(i)
         if df.shape[0] != 0 :
             corr = df[['GPNV', 'SE']].corr().iloc[0,1]
             X = np.array(df['GPNV']).reshape(-1,1)
@@ -1257,7 +1258,7 @@ def GP_SE_3(dealer):
             radius_scaled = max(k.fit_transform(df[['GPNV_norm','SE_norm']]))
             k=KMeans(1)
             radius = max(k.fit_transform(df[['GPNV','SE']]))
-            collector =[dealer ,df.shape[0] , corr , radius_scaled[0] , radius[0]]
+            collector =[dealer ,period , df.shape[0] , corr , radius_scaled[0] , radius[0]]
         
             collector.extend(regress_2.coef_)
             collector.append(regress_2.score(X_2 , df['SE_norm']))
@@ -1280,7 +1281,7 @@ pool.close()
 duration = time.time()-start 
 
 merged = list(itertools.chain.from_iterable(results))
-columns_name = ['dealer' ,'#ofrecords', 'correlation', 'radius_scaled' , 'radius' ,'B0' , 'B1' , 'B2', 'R2_deg2' , 'C0', 'C1', 'C2' , 'C3', 'R2_deg3' ]
+columns_name = ['dealer' ,'period' , '#ofrecords', 'correlation', 'radius_scaled' , 'radius' ,'B0' , 'B1' , 'B2', 'R2_deg2' , 'C0', 'C1', 'C2' , 'C3', 'R2_deg3' ]
 columns_name.extend(KPI.columns[2:35])
 columns_name.extend(KPI.columns[36:68])
 coef_revised = pd.DataFrame(merged , columns=columns_name)
